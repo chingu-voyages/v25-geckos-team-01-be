@@ -1,0 +1,24 @@
+{
+  "name": "v25-geckos-team-01-be",
+  "version": "1.0.0",
+  "description": "Chingu Voyage 25 Geckos 01 Backend repo",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chingu-voyages/v25-geckos-team-01-be.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chingu-voyages/v25-geckos-team-01-be/issues"
+  },
+  "homepage": "https://github.com/chingu-voyages/v25-geckos-team-01-be#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.10.13"
+  }
+}
