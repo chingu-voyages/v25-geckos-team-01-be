@@ -4,7 +4,7 @@
   "description": "Chingu Voyage 25 Geckos 01 Backend repo",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
