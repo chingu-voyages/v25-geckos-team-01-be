@@ -15,6 +15,9 @@ app.use(bodyParser.json()); // parse application/json
 const splashRouter = require("./routes/splash")
 app.use("/", splashRouter)
 
+const authRouter = require("./routes/auth")
+app.use("auth/", authRouter)
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Example app listening at http://localhost:${port}`);
