@@ -22,7 +22,8 @@ const userSchema = new mongoose.Schema({
         organization: organizationSchema,
         volunteer: volunteerSchema,
     },
-    password: { type: String, required: true }, // TODO: set: encryption & get: decryption aka actual authentication
+    password: { type: String, required: true },
 });
 
 module.exports = mongoose.model("User", userSchema);
+
