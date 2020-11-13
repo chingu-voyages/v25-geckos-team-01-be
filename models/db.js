@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const options = {
     useNewUrlParser: true,
-    // useUnifiedTopology: true,
+    useUnifiedTopology: true,
     // useCreateIndex: true,
     // useFindAndModify: false,
     // autoIndex: false, // Don't build indexes
@@ -20,5 +20,6 @@ const connectDB = async () => {
         console.log(err);
     }
 };
+
 
 module.exports = connectDB;
