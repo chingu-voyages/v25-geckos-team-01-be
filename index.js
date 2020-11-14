@@ -16,7 +16,7 @@ const splashRouter = require("./routes/splash")
 app.use("/", splashRouter)
 
 const authRouter = require("./routes/auth")
-app.use("auth/", authRouter)
+app.use("/auth/", authRouter)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
