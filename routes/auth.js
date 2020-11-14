@@ -4,16 +4,13 @@ const jwt = require("jsonwebtoken");
 
 const router = express.Router();
 
-const checkAccountStatus = (req, res, next) => {
-    // Need some kind of way to check if user not logged in. Else. Redirect to task
-    next();
-};
-
 // GET login
-router.get("/", checkAccountStatus, (req, res) => {});
+router.get("/", (req, res) => {
+    res.sendStatus(200);
+});
 
 // POST Login
-router.post("/", checkAccountStatus, async (req, res) => {
+router.post("/", async (req, res) => {
     try {
         let user = await User.findOne({ email: req.body.email });
         if (user) {
@@ -21,36 +18,34 @@ router.post("/", checkAccountStatus, async (req, res) => {
                 req.body.password,
                 user.password
             );
-            // TODO: make sure User Model has token field, _id field,
-            // TODO: make sure .env has a JWT_SECRET
             if (userIsAuthenticated) {
                 user.token = jwt.sign(
-                    { id: user._id },
+                    { _id: user._id, name: user.name },
                     process.env.JWT_SECRET,
                     { expiresIn: "10d" }
                 );
-                res.status(200).json({
+                res.sendStatus(200).json({
                     status: 200,
-                    data: "The Returned User Data",
+                    data: user,
                 });
             } else {
-                res.status(400).json({
+                res.json({
                     status: 400,
                     message: "Password is incorrect",
-                });
+                }).sendStatus(400);
             }
         } else {
-            res.status(400).json({
+            res.json({
                 status: 400,
                 message: "User does not exist",
-            });
+            }).sendStatus(400);
         }
     } catch (err) {
         console.log(err);
-        res.status(400).json({
+        res.json({
             message: "Some database error...maybe...?",
             err,
-        });
+        }).sendStatus(500);
     }
 });
 
@@ -60,29 +55,41 @@ router.get("/logoff", (req, res) => {
 });
 
 // Get Registration
-router.get("/register", checkAccountStatus, (req, res) => {
-    console.log("Get Registration Page");
+router.get("/register", (req, res) => {
+    res.sendStatus(200);
 });
 
 // POST Registration
-router.post("/register", checkAccountStatus, async (req, res) => {
+router.post("/register", async (req, res) => {
     try {
+        let {
+            name,
+            email,
+            phoneNumber,
+            role,
+            description,
+            tags,
+            password,
+        } = req.body;
         let user = new User();
-        user.name = req.body.name;
-        user.email = req.body.email;
-        user.phoneNumber = req.body.phoneNumber;
-        user.details = req.body.details;
-        // TODO: make sure the user model has the hashPassword method
-        user.password = user.generateHashedPassword(req.body.password);
+        user.name = name;
+        user.email = email;
+        user.phoneNumber = phoneNumber;
+        (user.role = role), (user.description = description);
+        user.tags = tags;
+        user.password = user.generateHashPassword(password);
         user = await user.save();
-        // Figure out why the token is placed after the save()
-        user.token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-            expiresIn: "10d",
-        });
-        res.status(200).json({ data: user });
+        user.token = jwt.sign(
+            { _id: user._id, name: user.name },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "10d",
+            }
+        );
+        res.sendStatus(200).json({ data: user });
     } catch (err) {
         console.log(err);
-        res.status(400).json({ message: "An error occurred", err });
+        res.sendStatus(500).json({ message: "An error occurred", err });
     }
 });
 

@@ -1,18 +1,15 @@
 const User = require("../models/User");
 
+const checkAccountStatus = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(" ")[1];
+    if (token == null) return res.sendStatus(401);
 
-////// File currently not in use. CONSIDER DELETING
-const loginUser = async (payload) => {
-    
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) return res.redirect("/").sendStatus(403);
+        req.user = user;
+        next();
+    });
 };
 
-const registerUser = async (payload) => {
-    const { name, email, phoneNumber, details, password } = payload;
-    // logic checking if passwords and username are not empty -- could be done in the routes folder
-    // logic checking if user exists
-    // logic checking if passwords match, ideally they would enter password twice
-    encryptPassword(password);
-    // Logic saving user
-};
-
-module.exports = { loginUser, registerUser };
+module.exports = { checkAccountStatus };
