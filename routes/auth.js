@@ -24,28 +24,28 @@ router.post("/", async (req, res) => {
                     process.env.JWT_SECRET,
                     { expiresIn: "10d" }
                 );
-                res.sendStatus(200).json({
+                res.json({
                     status: 200,
                     data: user,
                 });
             } else {
                 res.json({
-                    status: 400,
+                    status: 403,
                     message: "Password is incorrect",
-                }).sendStatus(400);
+                });
             }
         } else {
             res.json({
-                status: 400,
+                status: 401,
                 message: "User does not exist",
-            }).sendStatus(400);
+            });
         }
     } catch (err) {
         console.log(err);
         res.json({
             message: "Some database error...maybe...?",
             err,
-        }).sendStatus(500);
+        });
     }
 });
 
@@ -75,7 +75,8 @@ router.post("/register", async (req, res) => {
         user.name = name;
         user.email = email;
         user.phoneNumber = phoneNumber;
-        (user.role = role), (user.description = description);
+        user.role = role;
+        user.description = description;
         user.tags = tags;
         user.password = user.generateHashPassword(password);
         user = await user.save();
@@ -86,10 +87,10 @@ router.post("/register", async (req, res) => {
                 expiresIn: "10d",
             }
         );
-        res.sendStatus(200).json({ data: user });
+        res.json({ data: user });
     } catch (err) {
         console.log(err);
-        res.sendStatus(500).json({ message: "An error occurred", err });
+        res.sendStatus(500);
     }
 });
 

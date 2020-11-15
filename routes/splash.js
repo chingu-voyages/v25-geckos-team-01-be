@@ -4,10 +4,12 @@ const Task = require("../models/Task");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-    Task.find({}, (err, tasks) => {
-        if (err) res.json("Database error").sendStatus(500);
-        res.json(task).sendStatus(200);
-    });
+    try {
+        let tasks = await Task.find({});
+        res.json(tasks);
+    } catch (err) {
+        res.sendStatus(500);
+    }
 });
 
 module.exports = router;

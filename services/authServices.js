@@ -1,15 +1,19 @@
-const User = require("../models/User");
+const jwt = require("jsonwebtoken");
 
-const checkAccountStatus = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(" ")[1];
-    if (token == null) return res.sendStatus(401);
+const checkLoginStatus = (req, res, next) => {
+    // Gather the jwt access token from the request header
+    const authHeader = req.headers["authorization"];
+    const jsonToken = authHeader && authHeader.split(" ")[1];
+    if (jsonToken == null) return res.sendStatus(401); // if there isn't any token
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) return res.redirect("/").sendStatus(403);
+    jwt.verify(jsonToken, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            console.log(err);
+            res.sendStatus(403);
+        }
         req.user = user;
-        next();
+        next(); // pass the execution off to whatever request the client intended
     });
 };
 
-module.exports = { checkAccountStatus };
+module.exports = checkLoginStatus;
