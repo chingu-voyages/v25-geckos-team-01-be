@@ -10,7 +10,7 @@ router.get("/", (req, res) => {
 });
 
 // POST Login
-router.post("/", async (req, res) => {
+router.post("/login", async (req, res) => {
     try {
         let user = await User.findOne({ email: req.body.email });
         if (user) {
@@ -19,30 +19,28 @@ router.post("/", async (req, res) => {
                 user.password
             );
             if (userIsAuthenticated) {
-                user.token = jwt.sign(
+                let token = jwt.sign(
                     { _id: user._id, name: user.name },
                     process.env.JWT_SECRET,
                     { expiresIn: "10d" }
                 );
-                res.json({
-                    status: 200,
+                res.status(200).json({
                     data: user,
+                    token: token,
                 });
             } else {
-                res.json({
-                    status: 400,
+                res.status(400).json({
                     message: "Password is incorrect",
                 });
             }
         } else {
-            res.json({
-                status: 400,
+            res.status(400).json({
                 message: "User does not exist",
             });
         }
     } catch (err) {
         console.log(err);
-        res.json({
+        res.status(500).json({
             message: "Some database error...maybe...?",
             err,
         });
@@ -80,17 +78,17 @@ router.post("/register", async (req, res) => {
         user.tags = tags;
         user.password = user.generateHashPassword(password);
         await user.save();
-        user.token = jwt.sign(
+        let token = jwt.sign(
             { _id: user._id, name: user.name },
             process.env.JWT_SECRET,
             {
                 expiresIn: "10d",
             }
         );
-        res.json({ data: user });
+        res.status(200).json({ data: user, token: token });
     } catch (err) {
         console.log(err);
-        res.json({ message: "An error occurred", err }).sendStatus(400);
+        res.status(500).json("An error occurred");
     }
 });
 

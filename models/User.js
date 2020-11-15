@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema({
-    name: { type: String, required: true, minlength: 5, maxlength: 65 }, // The name of the person or organization
+    name: { type: String, required: true, maxlength: 125 }, // The name of the person or organization
     email: { type: String, lowercase: true, required: true, unique: true },
     phoneNumber: { type: String }, // could set: num=> '(111) 111-1111 ext. 1111
     role: { type: String, enum: ["organization", "volunteer"], require: true },
