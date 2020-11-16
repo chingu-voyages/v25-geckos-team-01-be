@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
 const checkLoginStatus = (req, res, next) => {
     // Gather the jwt access token from the request header
@@ -16,4 +17,17 @@ const checkLoginStatus = (req, res, next) => {
     });
 };
 
-module.exports = checkLoginStatus;
+const checkExistingUsers = async (req, res, next) => {
+    try {
+        const existingUser = await User.findOne({ email: req.body.email });
+        if (existingUser) {
+            res.json({ response: "User with that email already exists" });
+        } else {
+            next();
+        }
+    } catch (error) {
+        res.status(500).json({ Error: error });
+    }
+};
+
+module.exports = { checkLoginStatus, checkExistingUsers };

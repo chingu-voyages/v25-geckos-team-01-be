@@ -1,6 +1,10 @@
 const express = require("express");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
+const {
+    checkLoginStatus,
+    checkExistingUsers,
+} = require("../services/authServices");
 
 const router = express.Router();
 
@@ -12,44 +16,29 @@ router.get("/", (req, res) => {
 // POST Login
 router.post("/login", async (req, res) => {
     try {
-        let user = await User.findOne({ email: req.body.email });
+        const user = await User.findOne({ email: req.body.email });
         if (user) {
             let userIsAuthenticated = user.validatePassword(
                 req.body.password,
                 user.password
             );
             if (userIsAuthenticated) {
-                let token = jwt.sign(
-                    { _id: user._id, name: user.name },
-                    process.env.JWT_SECRET,
-                    { expiresIn: "10d" }
-                );
-                res.status(200).json({
-                    data: user,
-                    token: token,
-                });
+                res.status(200).json({ data: user.returnableAuthJson() });
             } else {
-                res.status(400).json({
-                    message: "Password is incorrect",
-                });
+                res.status(400).json("Email or password do not match");
             }
         } else {
-            res.status(400).json({
-                message: "User does not exist",
-            });
+            res.status(404).json("User not found");
         }
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({
-            message: "Some database error...maybe...?",
-            err,
-        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json("Database error: ", error);
     }
 });
 
 // GET logoff
 router.get("/logoff", (req, res) => {
-    console.log("Get to Logoff");
+    res.sendStatus(200);
 });
 
 // Get Registration
@@ -58,37 +47,20 @@ router.get("/register", (req, res) => {
 });
 
 // POST Registration
-router.post("/register", async (req, res) => {
+router.post("/register", checkExistingUsers, async (req, res) => {
     try {
-        let {
-            name,
-            email,
-            phoneNumber,
-            role,
-            description,
-            tags,
-            password,
-        } = req.body;
-        let user = new User();
-        user.name = name;
-        user.email = email;
-        user.phoneNumber = phoneNumber;
-        user.role = role;
-        user.description = description;
-        user.tags = tags;
-        user.password = user.generateHashPassword(password);
+        const user = new User();
+        user.name = req.body.name;
+        user.email = req.body.email;
+        user.phoneNumber = req.body.phoneNumber;
+        user.role = req.body.role;
+        user.description = req.body.description;
+        user.tags = req.body.tags;
+        user.password = user.generateHashPassword(req.body.password);
         await user.save();
-        let token = jwt.sign(
-            { _id: user._id, name: user.name },
-            process.env.JWT_SECRET,
-            {
-                expiresIn: "10d",
-            }
-        );
-        res.status(200).json({ data: user, token: token });
-    } catch (err) {
-        console.log(err);
-        res.status(500).json("An error occurred");
+        res.status(200).json({ data: user.returnableAuthJson() });
+    } catch (error) {
+        res.status(500).json({ Error: error });
     }
 });
 
