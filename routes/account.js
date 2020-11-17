@@ -8,17 +8,21 @@ const router = express.Router();
 // Get the Users Account
 router.get("/", protectedRouteAccess, async (req, res) => {
     try {
-        const user = await User.findById(req.user._id);
+        console.log("Got this far");
+        const user = await User.findById(req.user.id);
+        console.log("Got a little farther");
         // logic separating volunteer and organization account pages
         if (user.role === "organization") {
             const userTasks = await Task.find({ postedBy: user._id });
+            console.log("Got farther still");
             res.status(200).json({
                 data: user.returnableAuthJson(),
                 tasks: userTasks,
             });
         } else {
             // user is a volunteer
-            res.status(200).json({ user: user.returnableAuthJson() });
+            console.log("Why isnt this working");
+            res.status(200).json({ data: user.returnableAuthJson() });
         }
     } catch (err) {
         res.status(400);
@@ -26,21 +30,24 @@ router.get("/", protectedRouteAccess, async (req, res) => {
 });
 
 // Update the Users account
-
-// Finish this logic
 router.put("/", protectedRouteAccess, async (req, res) => {
     try {
-        let user = await User.findById(req.user._id);
-        user.update({
-            name: req.body.name,
-            email: req.body.email,
-            phoneNumber: req.body.phoneNumber,
-            role: req.body.role,
-            description: req.body.description,
-            tags: req.body.tags,
-        });
+        let updatedUser = await User.findByIdAndUpdate(
+            req.user._id,
+            {
+                name: req.body.name,
+                email: req.body.email,
+                phoneNumber: req.body.phoneNumber,
+                description: req.body.description,
+                tags: req.body.tags,
+                password: User.generateHashPassword(req.body.password),
+            },
+            { new: true }
+        );
+
+        console.log(updatedUser);
     } catch (error) {
-        res.status(500).json({ Error: error });
+        console.log(error);
     }
 });
 

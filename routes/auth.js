@@ -5,11 +5,6 @@ const { checkExistingUsers } = require("../services/authServices");
 
 const router = express.Router();
 
-// GET login
-router.get("/", (req, res) => {
-    res.sendStatus(200);
-});
-
 // POST Login
 router.post("/login", async (req, res) => {
     try {
@@ -33,16 +28,6 @@ router.post("/login", async (req, res) => {
     }
 });
 
-// GET logoff
-router.get("/logoff", (req, res) => {
-    res.sendStatus(200);
-});
-
-// Get Registration
-router.get("/register", (req, res) => {
-    res.sendStatus(200);
-});
-
 // POST Registration
 router.post("/register", checkExistingUsers, async (req, res) => {
     try {
@@ -53,7 +38,7 @@ router.post("/register", checkExistingUsers, async (req, res) => {
         user.role = req.body.role;
         user.description = req.body.description;
         user.tags = req.body.tags;
-        user.password = user.generateHashPassword(req.body.password);
+        user.password = User.generateHashPassword(req.body.password);
         await user.save();
         res.status(200).json({ data: user.returnableAuthJson() });
     } catch (error) {
