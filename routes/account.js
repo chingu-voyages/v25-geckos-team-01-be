@@ -1,15 +1,12 @@
 const express = require("express");
 const User = require("../models/User");
 const Task = require("../models/Task");
-const {
-    checkLoginStatus,
-    checkExistingUsers,
-} = require("../services/authServices");
+const { protectedRouteAccess } = require("../services/authServices");
 
 const router = express.Router();
 
 // Get the Users Account
-router.get("/", checkLoginStatus, async (req, res) => {
+router.get("/", protectedRouteAccess, async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
         // logic separating volunteer and organization account pages
@@ -31,7 +28,7 @@ router.get("/", checkLoginStatus, async (req, res) => {
 // Update the Users account
 
 // Finish this logic
-router.put("/", checkLoginStatus, async (req, res) => {
+router.put("/", protectedRouteAccess, async (req, res) => {
     try {
         let user = await User.findById(req.user._id);
         user.update({

@@ -1,10 +1,7 @@
 const express = require("express");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const {
-    checkLoginStatus,
-    checkExistingUsers,
-} = require("../services/authServices");
+const { checkExistingUsers } = require("../services/authServices");
 
 const router = express.Router();
 

@@ -1,9 +1,9 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-const checkLoginStatus = (req, res, next) => {
+const protectedRouteAccess = (req, res, next) => {
     // Gather the jwt access token from the request header
-    const authHeader = req.headers["token"];
+    const authHeader = req.headers["Authorization"];
     const jsonToken = authHeader && authHeader.split(" ")[1];
     if (jsonToken == null) return res.sendStatus(401); // if there isn't any token
 
@@ -16,6 +16,9 @@ const checkLoginStatus = (req, res, next) => {
         next();
     });
 };
+
+
+
 
 const checkExistingUsers = async (req, res, next) => {
     try {
@@ -30,4 +33,5 @@ const checkExistingUsers = async (req, res, next) => {
     }
 };
 
-module.exports = { checkLoginStatus, checkExistingUsers };
+
+module.exports = { protectedRouteAccess, checkExistingUsers };
