@@ -12,7 +12,6 @@ const userSchema = new mongoose.Schema(
             required: [true, "can't be blank"],
             maxlength: 125,
             unique: true,
-            match: [/^[a-zA-Z0-9]+$/, "is invalid"],
             index: true,
         },
         slug: { type: String, slug: "name" },
