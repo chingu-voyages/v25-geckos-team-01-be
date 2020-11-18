@@ -28,17 +28,38 @@ router.get("/", protectedRouteAccess, async (req, res) => {
 
 // Update the Users account
 router.put("/", protectedRouteAccess, async (req, res) => {
-    console.log(req.user);
-    console.log(req.body);
-    // if req.password encrypt the password
-    try {
-        let updatedUser = await User.findByIdAndUpdate(req.user.id, req.body, {
-            new: true,
-        });
+    // Should not be able to change the password here.
+    // changing the password would require generating a new token and generating a new hash password
+    if (req.body.password) {
+        res.json({ Error: "You can't change you password here" });
+    } else {
+        try {
+            let updatedUser = await User.findByIdAndUpdate(
+                req.user.id,
+                req.body,
+                {
+                    new: true,
+                }
+            );
 
-        res.json({ data: updatedUser.returnableAuthJson() });
+            res.json({ data: updatedUser.returnableAuthJson() });
+        } catch (error) {
+            res.status(400).json({ Error: error });
+        }
+    }
+});
+
+router.delete("/", protectedRouteAccess, async (req, res, next) => {
+    try {
+        await User.findByIdAndDelete(req.user.id, (error) => {
+            if (error) {
+                return res.json({ Error: "User could not be deleted" });
+            }
+            res.status(200).json({ data: "User has been deleted" });
+            // Here the client side would delete the token
+        });
     } catch (error) {
-        console.log(error);
+        res.status(400).json({ Error: error });
     }
 });
 
