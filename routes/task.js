@@ -17,7 +17,7 @@ router.get("/:userName/:taskID", async (req, res) => {
 router.post("/add", checkLoginStatus, async (req, res) => {
   // from user screen a new task can be created
     // purpose - form input, creates a new task that will be stored according to all input data
-    console.log("**************test********" + req.user)
+    console.log("**************test********", req.user)
   try {
     let {
       userName,
@@ -29,7 +29,7 @@ router.post("/add", checkLoginStatus, async (req, res) => {
       status
     } = req.body;
     let task = new Task();
-    task.postedBy = req.user;
+    task.postedBy = req.user; // tried req.user, but user name was not being added to task DB.
     task.title = title;
     task.description = description;
     task.skillsRequired = skillsRequired;
@@ -37,7 +37,7 @@ router.post("/add", checkLoginStatus, async (req, res) => {
     task.endTask = endTask;
     task.status = status;
     await task.save();
-    res.json({data: task});
+    res.status(200).json({data: task});
   } catch (err) {
     console.log(err);
     res.json({message: "An error occured", err}).sendStatus(400);
