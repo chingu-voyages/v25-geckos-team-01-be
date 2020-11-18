@@ -70,3 +70,21 @@ Return:
     }
 }
 ```
+
+#### Update Account Info
+Endpoint: "/account/" <br>
+Method: PUT <br>
+Header: `{"authorization": Bearer <token> }`
+Return: 
+``` 
+
+```
+Disclaimer you cannot update the password or role through this route. 
+
+#### Delete Account
+Endpoint: "/account/" <br>
+Method: DELETE <br>
+Header: `{"authorization": Bearer <token> }`
+Return: `This user was successfully deleted`
+
+The client side must delete wherever they are storing the json web token

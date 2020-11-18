@@ -30,7 +30,7 @@ router.get("/", isLoggedIn, async (req, res) => {
 router.put("/", isLoggedIn, async (req, res) => {
     // Should not be able to change the password here.
     // changing the password would require generating a new token and generating a new hash password
-    if (req.body.password) {
+    if (req.body.password || req.body.role) {
         res.json({ Error: "You can't change you password here" });
     } else {
         try {
