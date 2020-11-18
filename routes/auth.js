@@ -33,6 +33,7 @@ router.post("/register", checkExistingUsers, async (req, res) => {
     try {
         const user = new User();
         user.name = req.body.name;
+        user.slug = req.body.name; // lodash
         user.email = req.body.email;
         user.phoneNumber = req.body.phoneNumber;
         user.role = req.body.role;

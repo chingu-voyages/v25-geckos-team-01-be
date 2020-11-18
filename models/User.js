@@ -8,7 +8,11 @@ const userSchema = new mongoose.Schema({
         required: true,
         maxlength: 125,
         index: true,
-    }, // The name of the person or organization
+    },
+    slug: {
+      type: String,
+    },
+    // The name of the person or organization
     email: {
         type: String,
         lowercase: true,
