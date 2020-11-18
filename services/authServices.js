@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-const protectedRouteAccess = (req, res, next) => {
+const isLoggedIn = (req, res, next) => {
     // Gather the jwt access token from the request header
     const authHeader = req.headers["authorization"];
     const jsonToken = authHeader && authHeader.split(" ")[1];
@@ -39,4 +39,4 @@ const checkExistingUsers = async (req, res, next) => {
     }
 };
 
-module.exports = { protectedRouteAccess, checkExistingUsers };
+module.exports = { isLoggedIn, checkExistingUsers };
