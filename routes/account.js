@@ -1,17 +1,15 @@
 const express = require("express");
 const User = require("../models/User");
 const Task = require("../models/Task");
-const {
-    checkLoginStatus,
-    checkExistingUsers,
-} = require("../services/authServices");
+const { isLoggedIn } = require("../services/authServices");
 
 const router = express.Router();
 
 // Get the Users Account
-router.get("/", checkLoginStatus, async (req, res) => {
+router.get("/", isLoggedIn, async (req, res) => {
     try {
-        const user = await User.findById(req.user._id);
+        console.log("Got this far");
+        const user = await User.findById(req.user.id);
         // logic separating volunteer and organization account pages
         if (user.role === "organization") {
             const userTasks = await Task.find({ postedBy: user._id });
@@ -21,7 +19,7 @@ router.get("/", checkLoginStatus, async (req, res) => {
             });
         } else {
             // user is a volunteer
-            res.status(200).json({ user: user.returnableAuthJson() });
+            res.status(200).json({ data: user.returnableAuthJson() });
         }
     } catch (err) {
         res.status(400);
@@ -29,21 +27,39 @@ router.get("/", checkLoginStatus, async (req, res) => {
 });
 
 // Update the Users account
+router.put("/", isLoggedIn, async (req, res) => {
+    // Should not be able to change the password here.
+    // changing the password would require generating a new token and generating a new hash password
+    if (req.body.password || req.body.role) {
+        res.json({ Error: "You can't change you password here" });
+    } else {
+        try {
+            let updatedUser = await User.findByIdAndUpdate(
+                req.user.id,
+                req.body,
+                {
+                    new: true,
+                }
+            );
 
-// Finish this logic
-router.put("/", checkLoginStatus, async (req, res) => {
+            res.json({ data: updatedUser.returnableAuthJson() });
+        } catch (error) {
+            res.status(400).json({ Error: error });
+        }
+    }
+});
+
+router.delete("/", isLoggedIn, async (req, res, next) => {
     try {
-        let user = await User.findById(req.user._id);
-        user.update({
-            name: req.body.name,
-            email: req.body.email,
-            phoneNumber: req.body.phoneNumber,
-            role: req.body.role,
-            description: req.body.description,
-            tags: req.body.tags,
+        await User.findByIdAndDelete(req.user.id, (error) => {
+            if (error) {
+                return res.json({ Error: "User could not be deleted" });
+            }
+            res.status(200).json({ data: "User has been deleted" });
+            // Here the client side would delete the token
         });
     } catch (error) {
-        res.status(500).json({ Error: error });
+        res.status(400).json({ Error: error });
     }
 });
 

@@ -34,10 +34,12 @@ const userSchema = new mongoose.Schema({
     },
 });
 
-userSchema.methods.generateHashPassword = (password) => {
-    const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(password, salt);
-    return hash;
+userSchema.statics.generateHashPassword = (password) => {
+    if (password) {
+        const salt = bcrypt.genSaltSync(10);
+        const hash = bcrypt.hashSync(password, salt);
+        return hash;
+    }
 };
 
 userSchema.methods.validatePassword = (password, hashedPassword) => {
@@ -67,7 +69,7 @@ userSchema.methods.returnableAuthJson = function () {
         role: this.role,
         description: this.description,
         tags: this.tags,
-        token: this.generateJWT()
+        token: this.generateJWT(),
     };
 };
 

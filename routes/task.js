@@ -1,21 +1,18 @@
 const express = require("express");
 const Task = require("../models/Task");
-const {
-    checkLoginStatus,
-    checkExistingUsers,
-} = require("../services/authServices");
+const { isLoggedIn } = require("../services/authServices");
 
 const router = express.Router();
 
 // GET view Task screen
 router.get("/:userName/:taskID", async (req, res) => {
-  // search for task ID, task will contain user ID, return task info
-  console.log(req.params.userName)
+    // search for task ID, task will contain user ID, return task info
+    console.log(req.params.userName);
 });
 
 // POST to create a new Task
-router.post("/add", checkLoginStatus, async (req, res) => {
-  // from user screen a new task can be created
+router.post("/add", isLoggedIn, async (req, res) => {
+    // from user screen a new task can be created
     // purpose - form input, creates a new task that will be stored according to all input data
     console.log("**************test********", req.user)
   try {
@@ -46,7 +43,7 @@ router.post("/add", checkLoginStatus, async (req, res) => {
 
 // PUT to edit a Task
 router.put("/:userName/:taskID", async (req, res) => {
-  // from user screen, select task and make edits
+    // from user screen, select task and make edits
 });
 
 module.exports = router;
