@@ -1,12 +1,12 @@
 const express = require("express");
 const User = require("../models/User");
 const Task = require("../models/Task");
-const { protectedRouteAccess } = require("../services/authServices");
+const { isLoggedIn } = require("../services/authServices");
 
 const router = express.Router();
 
 // Get the Users Account
-router.get("/", protectedRouteAccess, async (req, res) => {
+router.get("/", isLoggedIn, async (req, res) => {
     try {
         console.log("Got this far");
         const user = await User.findById(req.user.id);
@@ -27,7 +27,7 @@ router.get("/", protectedRouteAccess, async (req, res) => {
 });
 
 // Update the Users account
-router.put("/", protectedRouteAccess, async (req, res) => {
+router.put("/", isLoggedIn, async (req, res) => {
     // Should not be able to change the password here.
     // changing the password would require generating a new token and generating a new hash password
     if (req.body.password) {
@@ -49,7 +49,7 @@ router.put("/", protectedRouteAccess, async (req, res) => {
     }
 });
 
-router.delete("/", protectedRouteAccess, async (req, res, next) => {
+router.delete("/", isLoggedIn, async (req, res, next) => {
     try {
         await User.findByIdAndDelete(req.user.id, (error) => {
             if (error) {
