@@ -10,18 +10,15 @@ router.get("/", protectedRouteAccess, async (req, res) => {
     try {
         console.log("Got this far");
         const user = await User.findById(req.user.id);
-        console.log("Got a little farther");
         // logic separating volunteer and organization account pages
         if (user.role === "organization") {
             const userTasks = await Task.find({ postedBy: user._id });
-            console.log("Got farther still");
             res.status(200).json({
                 data: user.returnableAuthJson(),
                 tasks: userTasks,
             });
         } else {
             // user is a volunteer
-            console.log("Why isnt this working");
             res.status(200).json({ data: user.returnableAuthJson() });
         }
     } catch (err) {
@@ -31,21 +28,15 @@ router.get("/", protectedRouteAccess, async (req, res) => {
 
 // Update the Users account
 router.put("/", protectedRouteAccess, async (req, res) => {
+    console.log(req.user);
+    console.log(req.body);
+    // if req.password encrypt the password
     try {
-        let updatedUser = await User.findByIdAndUpdate(
-            req.user._id,
-            {
-                name: req.body.name,
-                email: req.body.email,
-                phoneNumber: req.body.phoneNumber,
-                description: req.body.description,
-                tags: req.body.tags,
-                password: User.generateHashPassword(req.body.password),
-            },
-            { new: true }
-        );
+        let updatedUser = await User.findByIdAndUpdate(req.user.id, req.body, {
+            new: true,
+        });
 
-        console.log(updatedUser);
+        res.json({ data: updatedUser.returnableAuthJson() });
     } catch (error) {
         console.log(error);
     }
