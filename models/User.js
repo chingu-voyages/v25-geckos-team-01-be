@@ -1,42 +1,49 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const slug = require("mongoose-slug-generator");
 
-const userSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        maxlength: 125,
-        index: true,
+mongoose.plugin(slug);
+
+const userSchema = new mongoose.Schema(
+    {
+        name: {
+            type: String,
+            required: [true, "can't be blank"],
+            maxlength: 125,
+            unique: true,
+            index: true,
+        },
+        slug: { type: String, slug: "name" },
+        email: {
+            type: String,
+            lowercase: true,
+            unique: true,
+            required: [true, "can't be blank"],
+            match: [/\S+@\S+\.\S+/, "is invalid"],
+            index: true,
+        },
+        phoneNumber: {
+            type: String,
+        },
+        image: { type: String },
+        role: {
+            type: String,
+            enum: ["organization", "volunteer"],
+            require: true,
+        },
+        description: {
+            type: String,
+            maxlength: 450,
+        },
+        tags: [String],
+        password: {
+            type: String,
+            required: true,
+        },
     },
-    slug: {
-      type: String,
-    },
-    // The name of the person or organization
-    email: {
-        type: String,
-        lowercase: true,
-        required: true,
-        match: [/\S+@\S+\.\S+/, "is invalid"],
-    },
-    phoneNumber: {
-        type: String,
-    },
-    role: {
-        type: String,
-        enum: ["organization", "volunteer"],
-        require: true,
-    },
-    description: {
-        type: String,
-        maxlength: 450,
-    },
-    tags: [String],
-    password: {
-        type: String,
-        required: true,
-    },
-});
+    { timestamps: true }
+);
 
 userSchema.statics.generateHashPassword = (password) => {
     if (password) {
@@ -68,12 +75,24 @@ userSchema.methods.generateJWT = function () {
 userSchema.methods.returnableAuthJson = function () {
     return {
         name: this.name,
+        slug: this.slug,
         email: this.email,
         phoneNumber: this.phoneNumber,
+        image: this.image,
         role: this.role,
         description: this.description,
         tags: this.tags,
         token: this.generateJWT(),
+    };
+};
+
+userSchema.methods.returnableProfileJson = function () {
+    return {
+        name: this.name,
+        image: this.image,
+        role: this.role,
+        description: this.description,
+        tags: this.tags,
     };
 };
 
