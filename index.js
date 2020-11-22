@@ -10,6 +10,12 @@ connectDB();
 app.use(bodyParser.urlencoded({ extended: true })); // parse application/x-www-form-urlencoded
 app.use(bodyParser.json()); // parse application/json
 
+// CORS DEV
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "127.0.0.1:3000");
+    next();
+});
+
 const splashRouter = require("./routes/splash");
 app.use("/splash", splashRouter);
 
