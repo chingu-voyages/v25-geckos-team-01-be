@@ -16,6 +16,7 @@ app.use((req, res, next) => {
     next();
 });
 
+// Routes
 const splashRouter = require("./routes/splash");
 app.use("/splash", splashRouter);
 
@@ -28,6 +29,7 @@ app.use("/task/", taskRouter);
 const accountRouter = require("./routes/account");
 app.use("/account/", accountRouter);
 
+//
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Example app listening at http://localhost:${PORT}`);
