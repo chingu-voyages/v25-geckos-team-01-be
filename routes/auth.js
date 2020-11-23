@@ -15,7 +15,7 @@ router.post("/login", async (req, res) => {
                 user.password
             );
             if (userIsAuthenticated) {
-                res.status(200).json({ data: user.returnableAuthJson() });
+                res.status(200).json({ data: user.authenticatedResJson() });
             } else {
                 res.status(400).json("Email or password do not match");
             }
@@ -40,7 +40,7 @@ router.post("/register", checkExistingUsers, async (req, res) => {
         user.tags = req.body.tags;
         user.password = User.generateHashPassword(req.body.password);
         await user.save();
-        res.status(200).json({ data: user.returnableAuthJson() });
+        res.status(200).json({ data: user.authenticatedResJson() });
     } catch (error) {
         res.status(500).json({ Error: error });
     }

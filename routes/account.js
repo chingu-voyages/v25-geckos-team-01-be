@@ -14,12 +14,12 @@ router.get("/", isLoggedIn, async (req, res) => {
         if (user.role === "organization") {
             const userTasks = await Task.find({ postedBy: user._id });
             res.status(200).json({
-                data: user.returnableAuthJson(),
-                tasks: userTasks,
+                data: user.authenticatedResJson(),
+                tasks: userTasks.authenticatedResJson(),
             });
         } else {
             // user is a volunteer
-            res.status(200).json({ data: user.returnableAuthJson() });
+            res.status(200).json({ data: user.authenticatedResJson() });
         }
     } catch (err) {
         res.status(400);
@@ -42,7 +42,7 @@ router.put("/", isLoggedIn, async (req, res) => {
                 }
             );
 
-            res.json({ data: updatedUser.returnableAuthJson() });
+            res.json({ data: updatedUser.authenticatedResJson() });
         } catch (error) {
             res.status(400).json({ Error: error });
         }
@@ -61,6 +61,17 @@ router.delete("/", isLoggedIn, async (req, res, next) => {
     } catch (error) {
         res.status(400).json({ Error: error });
     }
+});
+
+router.get("/:userSlug", async (req, res) => {
+    try {
+        let profile = await User.find({ slug: req.params.userSlug });
+        res.json({ data: profile.resJson() });
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ Error: error });
+    }
+    // TODO: get user while not logged in
 });
 
 module.exports = router;

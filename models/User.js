@@ -73,7 +73,7 @@ userSchema.methods.generateJWT = function () {
     );
 };
 
-userSchema.methods.returnableAuthJson = function () {
+userSchema.methods.authenticatedResJson = function () {
     return {
         name: this.name,
         slug: this.slug,
@@ -87,7 +87,7 @@ userSchema.methods.returnableAuthJson = function () {
     };
 };
 
-userSchema.methods.returnableProfileJson = function () {
+userSchema.methods.resJson = function () {
     return {
         name: this.name,
         image: this.image,
