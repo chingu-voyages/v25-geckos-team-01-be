@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-mongoose.set('useCreateIndex', true);
+mongoose.set("useCreateIndex", true);
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const slug = require("mongoose-slug-generator");
@@ -75,6 +75,7 @@ userSchema.methods.generateJWT = function () {
 
 userSchema.methods.authenticatedResJson = function () {
     return {
+        id: this._id,
         name: this.name,
         slug: this.slug,
         email: this.email,
@@ -89,6 +90,7 @@ userSchema.methods.authenticatedResJson = function () {
 
 userSchema.methods.resJson = function () {
     return {
+        id: this._id,
         name: this.name,
         image: this.image,
         role: this.role,

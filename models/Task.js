@@ -6,11 +6,11 @@ const taskSchema = new mongoose.Schema({
     postedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     description: { type: String },
     skillsRequired: [String],
-    location: {
-        city: { type: String },
+    location: {        
         address: { type: String },
-        country: { type: String },
+        city: { type: String },
         zipCode: { type: String },
+        country: { type: String },
     },
     endTask: { type: Date },
     status: { type: String, default: "open", enum: ["open", "closed"] },
@@ -19,6 +19,7 @@ const taskSchema = new mongoose.Schema({
 
 taskSchema.methods.authenticatedResJson = function () {
     return {
+        id: this._id,
         title: this.title,
         postedBy: this.postedBy,
         description: this.description,
@@ -32,6 +33,7 @@ taskSchema.methods.authenticatedResJson = function () {
 
 taskSchema.methods.resJson = function () {
     return {
+        id: this._id,
         title: this.title,
         postedBy: this.postedBy,
         description: this.description,
