@@ -56,7 +56,7 @@ router.delete("/", isLoggedIn, async (req, res, next) => {
                 return res.json({ Error: "User could not be deleted" });
             }
             res.status(200).json({ data: "User has been deleted" });
-            // Here the client side would delete the token
+            // Here the client side would delete the token and be redirected to
         });
     } catch (error) {
         res.status(400).json({ Error: error });
@@ -65,13 +65,17 @@ router.delete("/", isLoggedIn, async (req, res, next) => {
 
 router.get("/:userSlug", async (req, res) => {
     try {
-        let profile = await User.find({ slug: req.params.userSlug });
-        res.json({ data: profile.resJson() });
+        let profile = await User.findOne({ slug: req.params.userSlug });
+        // console.log(profile)
+        if (profile){
+            res.status(200).json({ data: profile.resJson() });
+        } else {
+            res.status(404).json({response: "Sorry no user by that name"})
+        }
     } catch (error) {
         console.log(error);
         res.status(400).json({ Error: error });
     }
-    // TODO: get user while not logged in
 });
 
 module.exports = router;
