@@ -106,4 +106,9 @@ router.get("/:userName/:taskId", (req, res) => {
     });
 });
 
+// DELETE task
+router.delete("/delete", (req, res) => {
+  // need to find task per req.body, and if user logged in matches the postBy for the task, then delete
+});
+
 module.exports = router;
