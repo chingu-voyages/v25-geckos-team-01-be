@@ -105,4 +105,26 @@ router.get("/:userName/:taskId", (req, res) => {
     });
 });
 
+// DELETE task
+router.delete("/delete/:taskId", isLoggedIn, (req, res) => {
+  // need to find task per req.body, and if user logged in matches the postBy for the task, then delete
+  Task.findOne({_id: req.params.taskId}, (err, doc) => {
+    if (err) {
+      console.log(err);
+    } else {
+      if (req.user.id == doc.postedBy) {
+        Task.deleteOne({_id: req.params.taskId}, (error) => {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("successful delete");
+            res.status(200).json({data: doc});
+          }
+        });
+      }
+    }
+  });
+
+});
+
 module.exports = router;
