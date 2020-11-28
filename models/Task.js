@@ -1,18 +1,12 @@
 const mongoose = require("mongoose");
-mongoose.set("useCreateIndex", true);
 
 const taskSchema = new mongoose.Schema({
-    title: { type: String },
+    title: { type: String, require: true },
     postedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    description: { type: String },
+    description: { type: String, require: true },
     skillsRequired: [String],
-    location: {        
-        address: { type: String },
-        city: { type: String },
-        zipCode: { type: String },
-        country: { type: String },
-    },
-    endTask: { type: Date },
+    location: { type: String },
+    taskEnd: { type: Date },
     status: { type: String, default: "open", enum: ["open", "closed"] },
     interestedIn: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 });
@@ -25,7 +19,7 @@ taskSchema.methods.authenticatedResJson = function () {
         description: this.description,
         skillsRequired: this.skillsRequired,
         location: this.location,
-        endTask: this.endTask,
+        taskEnd: this.taskEnd,
         status: this.status,
         interestedIn: this.interestedIn,
     };
@@ -39,7 +33,7 @@ taskSchema.methods.resJson = function () {
         description: this.description,
         skillsRequired: this.skillsRequired,
         location: this.location,
-        endTask: this.endTask,
+        taskEnd: this.taskEnd,
         status: this.status,
     };
 };

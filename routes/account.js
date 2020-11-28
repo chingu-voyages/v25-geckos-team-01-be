@@ -5,10 +5,9 @@ const { isLoggedIn } = require("../services/authServices");
 
 const router = express.Router();
 
-// Get the Users Account
+// Get the currently logged in Users account info
 router.get("/", isLoggedIn, async (req, res) => {
     try {
-        console.log("Got this far");
         const user = await User.findById(req.user.id);
         // logic separating volunteer and organization account pages
         if (user.role === "organization") {
@@ -26,7 +25,7 @@ router.get("/", isLoggedIn, async (req, res) => {
     }
 });
 
-// Update the Users account
+// Update the currently logged in Users account info
 router.put("/", isLoggedIn, async (req, res) => {
     // Should not be able to change the password here.
     // changing the password would require generating a new token and generating a new hash password
@@ -49,6 +48,7 @@ router.put("/", isLoggedIn, async (req, res) => {
     }
 });
 
+// Delete the currently logged in User info
 router.delete("/", isLoggedIn, async (req, res, next) => {
     try {
         await User.findByIdAndDelete(req.user.id, (error) => {
@@ -63,6 +63,7 @@ router.delete("/", isLoggedIn, async (req, res, next) => {
     }
 });
 
+// Get a users  profile regardless of login status
 router.get("/:userSlug", async (req, res) => {
     try {
         let profile = await User.findOne({ slug: req.params.userSlug });

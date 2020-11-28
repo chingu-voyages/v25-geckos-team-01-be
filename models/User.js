@@ -67,6 +67,7 @@ userSchema.methods.generateJWT = function () {
         {
             id: this._id,
             name: this.name,
+            role: this.role,
         },
         process.env.JWT_SECRET,
         { expiresIn: "10h" }
