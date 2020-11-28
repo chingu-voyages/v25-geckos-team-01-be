@@ -2,7 +2,6 @@ const express = require("express");
 const Task = require("../models/Task");
 const { isLoggedIn } = require("../services/authServices");
 const mongoose = require("mongoose");
-mongoose.set("useCreateIndex", true);
 
 const router = express.Router();
 
@@ -10,33 +9,48 @@ const router = express.Router();
 router.post("/add", isLoggedIn, async (req, res) => {
     // from user screen a new task can be created
     // purpose - form input, creates a new task that will be stored according to all input data
+    console.log(req.body);
+    if (req.user.role === "organization") {
+        try {
+            const task = new Task();
+            task.title = req.body.title;
+            task.postedBy = req.user.id;
+            task.description = req.body.description;
+            task.skillsRequired = req.body.skillsRequired;
+            task.location = req.body.location;
+            task.taskEnd = req.body.taskEnd;
+            task.status = req.body.status;
+            await task.save();
+            res.status(200).json({ data: task.authenticatedResJson() });
+        } catch (error) {
+            res.status(400).json({ Error: error });
+        }
+    } else {
+        res.status(401).json({
+            response: "You must be an organization to add a Task",
+        });
+    }
+});
+
+// GET to view a Task in edit mode
+router.get("/edit/:taskId", isLoggedIn, async (req, res) => {
     try {
-        let {
-            title,
-            description,
-            skillsRequired,
-            location,
-            endTask,
-            status,
-        } = req.body;
-        let task = new Task();
-        task.postedBy = req.user.id;
-        task.title = title;
-        task.description = description;
-        task.skillsRequired = skillsRequired;
-        task.location = location;
-        task.endTask = endTask;
-        task.status = status;
-        await task.save();
-        res.status(200).json({ data: task });
-    } catch (err) {
-        console.log(err);
-        res.json({ message: "An error occurred", err }).sendStatus(400);
+        let task = await Task.findById(req.params.taskId); // find task by ID
+        // check if the logged in user is task author
+        if (task.postedBy == req.user.id) {
+            res.status(200).json({ data: task.authenticatedResJson() });
+        } else {
+            res.status(401).json({
+                response: `${req.user.name} is not authorized to edit Task`,
+            });
+        }
+    } catch (error) {
+        res.status(400).json({ Error: error });
     }
 });
 
 // PUT update Task
-router.put("/update/:taskId", isLoggedIn, (req, res) => {
+router.put("/edit/:taskId", isLoggedIn, (req, res) => {
     // From user screen, select task, which then requests the task Database - bring over task id and user which is identified by jwt jsonwebtoken
     // Find task based on param, check that user postedby is logged in, find and update task, then return data
     Task.findOne({ _id: req.params.taskId }, (err, doc) => {
@@ -52,44 +66,20 @@ router.put("/update/:taskId", isLoggedIn, (req, res) => {
                     (error, task) => {
                         if (error) console.log(error);
                         else {
-                            console.log("updated task");
-                            res.status(200).json({ data: req.body });
+                            res.status(200).json({
+                                data: task.authenticatedResJson(),
+                            });
                         }
                     }
                 );
             } else {
-                console.log("User not authorized to edit that task.");
-                mongoose.connection.close();
-            }
-        }
-    });
-});
-
-// GET to view a Task in edit mode
-router.get("/edit/:taskId", isLoggedIn, (req, res) => {
-    // from organization profile screen, click on task and go to an edit screen where values can be changed.
-    // verify logged in user matches postedBy for task, find and provide data
-    //** currently not working, can possibly merge this route with view task route in some way.
-    Task.findOne({ _id: req.params.taskId }, (err, doc) => {
-        if (err) {
-            console.log(err);
-        } else {
-            if (req.user.id == doc.postedBy) {
-                Task.findOne({ _id: doc.postedBy }, (error, task) => {
-                    if (error) {
-                        console.log(error);
-                    } else {
-                        console.log("task found", task.postedBy);
-                        res.status(200).json({ data: task });
-                    }
+                res.status(401).json({
+                    response: `${req.user.name} is not authorized to edit Task`,
                 });
-            } else {
-                console.log("User not authorized to edit that task.");
                 mongoose.connection.close();
             }
         }
     });
-    // TODO: switch to await
 });
 
 // GET view Task screen
@@ -100,31 +90,34 @@ router.get("/:userName/:taskId", (req, res) => {
             console.log(err);
         } else {
             console.log("task found");
-            res.status(200).json({ data: doc });
+            res.status(200).json({ data: doc.resJson() });
         }
     });
 });
 
 // DELETE task
 router.delete("/delete/:taskId", isLoggedIn, (req, res) => {
-  // need to find task per req.body, and if user logged in matches the postBy for the task, then delete
-  Task.findOne({_id: req.params.taskId}, (err, doc) => {
-    if (err) {
-      console.log(err);
-    } else {
-      if (req.user.id == doc.postedBy) {
-        Task.deleteOne({_id: req.params.taskId}, (error) => {
-          if (error) {
-            console.log(error);
-          } else {
-            console.log("successful delete");
-            res.status(200).json({data: doc});
-          }
-        });
-      }
-    }
-  });
-
+    // need to find task per req.body, and if user logged in matches the postBy for the task, then delete
+    Task.findOne({ _id: req.params.taskId }, (err, doc) => {
+        if (err) {
+            console.log(err);
+        } else {
+            if (req.user.id == doc.postedBy) {
+                Task.deleteOne({ _id: req.params.taskId }, (error) => {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        console.log("successful delete");
+                        res.status(200).json({
+                            data: doc.authenticatedResJson(),
+                        });
+                    }
+                });
+            } else{
+                res.status(401).json({response: `${req.user.name} is not authorized to delete this post`})
+            }
+        }
+    });
 });
 
 module.exports = router;
