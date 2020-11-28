@@ -129,3 +129,89 @@ Return:
 ```
 
 The client side must delete wherever they are storing the json web token
+
+
+### Task Routes
+* User interested in functionality is not set up and working. 
+
+#### Add Task
+
+Endpoint: "/task/add/" <br>
+Method: POST <br>
+Header: `{"authorization" : Bearer <token>}` <br>
+Body: title, description, skillsRequired(O), location(O), taskEnd <br>
+Return:
+```
+{
+    "data": {
+        "id": "5fc2a3b13132f38508b22927",
+        "title": "Task",
+        "postedBy": "5fc28ae8f3f63b4250aa2c42",
+        "description": "task description",
+        "skillsRequired": [
+            "css, javascript, html"
+        ],
+        "location": "Wallabey Way Sydney, Australia",
+        "taskEnd": "2029-09-29T04:00:00.000Z",
+        "interestedIn": []
+    }
+}
+```
+The authenticated user must be an organization
+
+#### Edit Task View
+
+Endpoint: "task/edit/:taskId/" <br>
+Method: GET, PUT <br>
+Header: `{"authorization" : Bearer <token>}` <br>
+Body: title(O), description(O), skillsRequired(O), location(O), taskEnd(O), status(O) <br>
+Return: 
+```
+{
+    "data": {
+        "id": "5fc2a3b13132f38508b22927",
+        "title": "New Task",
+        "postedBy": "5fc28ae8f3f63b4250aa2c42",
+        "description": "task description",
+        "skillsRequired": [
+            "css, javascript, html"
+        ],
+        "location": "Wallabey Way Sydney, Australia",
+        "taskEnd": "2029-09-29T04:00:00.000Z",
+        "status": "open",
+        "interestedIn": []
+    }
+}
+```
+The authenticated user must be the author of the Task. All updated values are optional, but the skills Required Array is not added onto, but replaced completely.  
+
+#### Anonymous User Task View
+
+Endpoint: "task/:userName/:taskId/" <br>
+Method: GET <br>
+Return: 
+```
+{
+    "data": {
+        "id": "5fc2a3b13132f38508b22927",
+        "title": "New Task",
+        "postedBy": "5fc28ae8f3f63b4250aa2c42",
+        "description": "task description",
+        "skillsRequired": [
+            "css, javascript, html"
+        ],
+        "location": "Wallabey Way Sydney, Australia",
+        "taskEnd": "2029-09-29T04:00:00.000Z",
+        "status": "open"
+    }
+}
+```
+The Interested In Array is not shown.
+
+#### Delete Task
+
+Endpoint: "task/delete/:taskId/" <br>
+Method: DELETE <br>
+Header: `{"authorization" : Bearer <token>}` <br>
+<br>
+Ideally instead of deleting a Task the User would change the status from "open" to "closed"
