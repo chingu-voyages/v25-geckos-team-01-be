@@ -14,12 +14,12 @@ router.get("/", isLoggedIn, async (req, res) => {
         if (user.role === "organization") {
             const userTasks = await Task.find({ postedBy: user._id });
             res.status(200).json({
-                data: user.returnableAuthJson(),
-                tasks: userTasks,
+                data: user.authenticatedResJson(),
+                tasks: userTasks.authenticatedResJson(),
             });
         } else {
             // user is a volunteer
-            res.status(200).json({ data: user.returnableAuthJson() });
+            res.status(200).json({ data: user.authenticatedResJson() });
         }
     } catch (err) {
         res.status(400);
@@ -42,7 +42,7 @@ router.put("/", isLoggedIn, async (req, res) => {
                 }
             );
 
-            res.json({ data: updatedUser.returnableAuthJson() });
+            res.json({ data: updatedUser.authenticatedResJson() });
         } catch (error) {
             res.status(400).json({ Error: error });
         }
@@ -56,9 +56,24 @@ router.delete("/", isLoggedIn, async (req, res, next) => {
                 return res.json({ Error: "User could not be deleted" });
             }
             res.status(200).json({ data: "User has been deleted" });
-            // Here the client side would delete the token
+            // Here the client side would delete the token and be redirected to
         });
     } catch (error) {
+        res.status(400).json({ Error: error });
+    }
+});
+
+router.get("/:userSlug", async (req, res) => {
+    try {
+        let profile = await User.findOne({ slug: req.params.userSlug });
+        // console.log(profile)
+        if (profile){
+            res.status(200).json({ data: profile.resJson() });
+        } else {
+            res.status(404).json({response: "Sorry no user by that name"})
+        }
+    } catch (error) {
+        console.log(error);
         res.status(400).json({ Error: error });
     }
 });
