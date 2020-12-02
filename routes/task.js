@@ -98,6 +98,7 @@ router.get("/:userName/:taskId", (req, res) => {
 // PUT - add interestedIn user from task
 router.put("/add-interest/:taskId", isLoggedIn, (req, res) => {
   // if logged in user clicks interest in a task, they are added to interestedIn array. Duplication of interest is prohibited
+    // $addToSet can be used instead of forEach loop, instead, will only add 1 total instance
   Task.findOne({ _id: req.params.taskId }, (err, doc) => {
     let addInterestedUser = {
       user: req.user.id,
@@ -107,7 +108,7 @@ router.put("/add-interest/:taskId", isLoggedIn, (req, res) => {
     if (err) {
       console.log(err);
     } else {
-      doc.interestedIn.find(e => {
+      doc.interestedIn.forEach(e => {
         if (e.user == req.user.id) {
           console.log("Duplicate request. User interest already added.");
           res.status(403).json({ data: doc.resJson });
@@ -131,8 +132,16 @@ router.put("/add-interest/:taskId", isLoggedIn, (req, res) => {
 
 // PUT - remove interestedIn user from task
 router.put("/remove-interest/:taskId", isLoggedIn, (req, res) => {
-  // should be able to include remove in above, change the route name, and include if conditional to check if the task id already has the user name in the interestedIn field, if it does, then it can be removed, if not, it this is not authorized.
-    // do not want to add a duplicate user to the task for interest.
+  // include if conditional to check if the task id already has the user name in the interestedIn field, if it does, then it can be removed, if not, it this is not authorized.
+  Task.findOneAndUpdate({ _id: req.params.taskId }, {$pullAll: {interestedIn: [{user: req.user.id }] } }, (err, doc) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log("User removed, if they were on list.");
+      res.status(200).json({data: doc.resJson});
+        }
+      });
+
 });
 
 // PUT - org. to accept or decline interestedIn user
