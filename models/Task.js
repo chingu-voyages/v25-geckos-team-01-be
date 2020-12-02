@@ -8,7 +8,11 @@ const taskSchema = new mongoose.Schema({
     location: { type: String },
     taskEnd: { type: Date },
     status: { type: String, default: "open", enum: ["open", "closed"] },
-    interestedIn: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    interestedIn: [{
+      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      accepted: {type: String, default: null, enum: [null, "yes", "no"]},
+      _id: false
+   }],
 });
 
 taskSchema.methods.authenticatedResJson = function () {
