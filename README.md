@@ -68,7 +68,7 @@ After registering save the token to become signed in.
 
 Endpoint: "/account/" <br>
 Method: GET <br>
-Header: `{"authorization": Bearer <token> }`
+Header: `{"authorization": Bearer <token> }`  
 Return:
 
 ```
@@ -92,7 +92,7 @@ Return:
 
 Endpoint: "/account/" <br>
 Method: PUT <br>
-Header: `{"authorization": Bearer <token> }`
+Header: `{"authorization": Bearer <token> }`  
 Body: name(U), email(U), phoneNumber(O), description(O), tags(O) <br>
 Return:
 
@@ -119,7 +119,7 @@ Disclaimer you cannot update the password or role through this route.
 
 Endpoint: "/account/" <br>
 Method: DELETE <br>
-Header: `{"authorization": Bearer <token> }`
+Header: `{"authorization": Bearer <token> }`  
 Return:
 
 ```
@@ -161,7 +161,7 @@ The authenticated user must be an organization
 #### Edit Task View
 
 Endpoint: "task/edit/:taskId/" <br>
-Method: PUT
+Method: PUT  
 Header: `{"authorization" : Bearer <token>}` <br>
 Body: title(O), description(O), skillsRequired(O), location(O), taskEnd(O), status(O) <br>
 Return:
@@ -186,8 +186,8 @@ The authenticated user must be the author of the Task. All updated values are op
 
 #### Anonymous User Task View
 
-Endpoint: "task/:userName/:taskId/"
-Method: GET
+Endpoint: "task/:userName/:taskId/"  
+Method: GET  
 Return:
 ```
 {
@@ -209,9 +209,9 @@ The Interested In Array is not shown.
 
 #### Volunteer - Add Interest
 
-Endpoint: "/task/add-interest/:taskId"
-Method: PUT
-Header: {"authorization" : Bearer <token>}
+Endpoint: "/task/add-interest/:taskId"  
+Method: PUT  
+Header: {"authorization" : Bearer <token>}  
 Return:
 ```
 {
@@ -233,9 +233,9 @@ Return:
 
 #### Volunteer - Remove Interest
 
-Endpoint: "/task/remove-interest/:taskId"
-Method: PUT
-Header: {"authorization" : Bearer <token>}
+Endpoint: "/task/remove-interest/:taskId"  
+Method: PUT  
+Header: {"authorization" : Bearer <token>}  
 Return:
 ```
 {
@@ -255,10 +255,10 @@ Return:
 
 #### Organization - Accept/Decline Interest from Volunteer
 
-Endpoint: "/task/accept-interest/:taskId"
-Method: PUT
-Header: {"authorization" : Bearer <token>}
-Body: acceptedStatus(R)(no / yes), volunteer(R)(use id #)
+Endpoint: "/task/accept-interest/:taskId"  
+Method: PUT  
+Header: {"authorization" : Bearer <token>}  
+Body: acceptedStatus(R)(no / yes), volunteer(R)(use id #)  
 Return:
 ```
 {
