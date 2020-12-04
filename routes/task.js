@@ -132,7 +132,6 @@ router.put("/add-interest/:taskId", isLoggedIn, (req, res) => {
 
 // PUT - remove interestedIn user from task
 router.put("/remove-interest/:taskId", isLoggedIn, (req, res) => {
-  // include if conditional to check if the task id already has the user name in the interestedIn field, if it does, then it can be removed, if not, it this is not authorized.
   Task.findOneAndUpdate({ _id: req.params.taskId }, {$pullAll: {interestedIn: [{user: req.user.id }] } }, (err, doc) => {
     if (err) {
       console.log(err);
@@ -145,9 +144,37 @@ router.put("/remove-interest/:taskId", isLoggedIn, (req, res) => {
 });
 
 // PUT - org. to accept or decline interestedIn user
-router.put("/", isLoggedIn, (req,res) => {
-  // write-up
-  let accepted = req.body.accepted; // should be true or false
+router.put("/accept-interest/:taskId", isLoggedIn, async (req,res) => {
+  // on task screen, org. can click on a volunteer that is interestedIn task. If the org. is the creator of the task, then they can either click accept yes, or no.
+  let { acceptedStatus, volunteer } = req.body;
+  Task.findOne({_id: req.params.taskId }, (err, doc) => {
+    let volunteerInterestFound = false;
+
+    if (err) {
+      console.log(err);
+    } else if (req.user.id == doc.postedBy) {
+        doc.interestedIn.forEach(e => {
+          if (e.user == volunteer) {
+            //user matched - make change
+            volunteerInterestFound = true;
+            e.accepted = acceptedStatus;
+            doc.save();
+            console.log("Volunteer acceptedStatus updated");
+            res.status(200).json( {data: doc.authenticatedResJson });
+          }
+        });
+        if (!volunteerInterestFound) {
+          console.log("Volunteer not found on list.");
+          res.status(404).json({data: doc.resJson});
+        }
+
+    } else {
+      console.log("User is not creator of task and authorized to update interestedIn status.");
+      res.status(403).json({ data: doc.resJson });
+    }
+
+  });
+
 });
 
 // DELETE task
