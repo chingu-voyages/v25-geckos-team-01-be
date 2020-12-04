@@ -99,35 +99,40 @@ router.get("/:userName/:taskId", (req, res) => {
 router.put("/add-interest/:taskId", isLoggedIn, (req, res) => {
   // if logged in user clicks interest in a task, they are added to interestedIn array. Duplication of interest is prohibited
     // $addToSet can be used instead of forEach loop, instead, will only add 1 total instance
-  Task.findOne({ _id: req.params.taskId }, (err, doc) => {
-    let addInterestedUser = {
-      user: req.user.id,
-      accepted: null
-    }
-    let userAdded = false;
-    if (err) {
-      console.log(err);
-    } else {
-      doc.interestedIn.forEach(e => {
-        if (e.user == req.user.id) {
-          console.log("Duplicate request. User interest already added.");
-          res.status(403).json({ data: doc.resJson });
-          return userAdded = true;
-        }
-      });
-
-      if (!userAdded) {
-        Task.findOneAndUpdate({ _id: req.params.taskId }, {$push: {interestedIn: addInterestedUser} }, (error, task) => {
-          if (error) {
-            console.log(error);
-          } else {
-            console.log("user added interest to task");
-            res.status(200).json({data: task.resJson});
-        }
-        });
+  if (req.user.role === "organization") {
+    console.log("Not authorized. Only volunteers can add interest");
+    res.sendStatus(403);
+  } else {
+    Task.findOne({ _id: req.params.taskId }, (err, doc) => {
+      let addInterestedUser = {
+        user: req.user.id,
+        accepted: null
       }
-    }
-  });
+      let userAdded = false;
+      if (err) {
+        console.log(err);
+      } else {
+        doc.interestedIn.forEach(e => {
+          if (e.user == req.user.id) {
+            console.log("Duplicate request. User interest already added.");
+            res.status(403).json({ data: doc.resJson });
+            return userAdded = true;
+          }
+        });
+
+        if (!userAdded) {
+          Task.findOneAndUpdate({ _id: req.params.taskId }, {$push: {interestedIn: addInterestedUser} }, (error, task) => {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log("user added interest to task");
+              res.status(200).json({data: task.resJson});
+          }
+          });
+        }
+      }
+    });
+  }
 });
 
 // PUT - remove interestedIn user from task
