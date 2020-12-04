@@ -132,7 +132,6 @@ The client side must delete wherever they are storing the json web token
 
 
 ### Task Routes
-* User interested in functionality is not set up and working. 
 
 #### Add Task
 
@@ -162,10 +161,10 @@ The authenticated user must be an organization
 #### Edit Task View
 
 Endpoint: "task/edit/:taskId/" <br>
-Method: GET, PUT <br>
+Method: PUT
 Header: `{"authorization" : Bearer <token>}` <br>
 Body: title(O), description(O), skillsRequired(O), location(O), taskEnd(O), status(O) <br>
-Return: 
+Return:
 ```
 {
     "data": {
@@ -187,9 +186,9 @@ The authenticated user must be the author of the Task. All updated values are op
 
 #### Anonymous User Task View
 
-Endpoint: "task/:userName/:taskId/" <br>
-Method: GET <br>
-Return: 
+Endpoint: "task/:userName/:taskId/"
+Method: GET
+Return:
 ```
 {
     "data": {
@@ -207,6 +206,87 @@ Return:
 }
 ```
 The Interested In Array is not shown.
+
+#### Volunteer - Add Interest
+
+Endpoint: "/task/add-interest/:taskId"
+Method: PUT
+Header: {"authorization" : Bearer <token>}
+Return:
+```
+{
+    "data": {
+        "id": "5fc914d6d5fdab442cb06072",
+        "title": "Testing Task",
+        "postedBy": "5fc914bdd5fdab442cb06071",
+        "description": "Et architecto qui occaecati voluptatem illum qui est non. Neque veritatis nulla...",
+        "skillsRequired": [
+            "html, css, javascript"
+        ],
+        "location": "Remote",
+        "status": "open"
+    }
+}
+```
+
+* Only a volunteer can add interest, and they must be logged in to do so.
+
+#### Volunteer - Remove Interest
+
+Endpoint: "/task/remove-interest/:taskId"
+Method: PUT
+Header: {"authorization" : Bearer <token>}
+Return:
+```
+{
+    "data": {
+        "id": "5fc914d6d5fdab442cb06072",
+        "title": "Testing Task",
+        "postedBy": "5fc914bdd5fdab442cb06071",
+        "description": "Et architecto qui occaecati voluptatem illum qui est non. Neque veritatis nulla laboriosam...",
+        "skillsRequired": [
+            "html, css, javascript"
+        ],
+        "location": "Remote",
+        "status": "open"
+    }
+}
+```
+
+#### Organization - Accept/Decline Interest from Volunteer
+
+Endpoint: "/task/accept-interest/:taskId"
+Method: PUT
+Header: {"authorization" : Bearer <token>}
+Body: acceptedStatus(R)(no / yes), volunteer(R)(use id #)
+Return:
+```
+{
+    "data": {
+        "id": "5fc914d6d5fdab442cb06072",
+        "title": "Testing Task",
+        "postedBy": "5fc914bdd5fdab442cb06071",
+        "description": "Et architecto qui occaecati voluptatem illum qui est non. Neque veritatis nulla...",
+        "skillsRequired": [
+            "html, css, javascript"
+        ],
+        "location": "Remote",
+        "status": "open",
+        "interestedIn": [
+            {
+                "accepted": "no",
+                "user": "5fc8079e42bdda256489ff19"
+            },
+            {
+                "accepted": "yes",
+                "user": "5fca74ca4132ae20fcdfb362"
+            }
+        ]
+    }
+}
+```
+
+* (R) is required
 
 #### Delete Task
 

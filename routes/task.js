@@ -115,7 +115,7 @@ router.put("/add-interest/:taskId", isLoggedIn, (req, res) => {
         doc.interestedIn.forEach(e => {
           if (e.user == req.user.id) {
             console.log("Duplicate request. User interest already added.");
-            res.status(403).json({ data: doc.resJson });
+            res.status(403).json({ data: doc.resJson() });
             return userAdded = true;
           }
         });
@@ -126,7 +126,7 @@ router.put("/add-interest/:taskId", isLoggedIn, (req, res) => {
               console.log(error);
             } else {
               console.log("user added interest to task");
-              res.status(200).json({data: task.resJson});
+              res.status(200).json({data: task.resJson()});
           }
           });
         }
@@ -142,7 +142,7 @@ router.put("/remove-interest/:taskId", isLoggedIn, (req, res) => {
       console.log(err);
     } else {
       console.log("User removed, if they were on list.");
-      res.status(200).json({data: doc.resJson});
+      res.status(200).json({data: doc.resJson() });
         }
       });
 
@@ -165,17 +165,17 @@ router.put("/accept-interest/:taskId", isLoggedIn, async (req,res) => {
             e.accepted = acceptedStatus;
             doc.save();
             console.log("Volunteer acceptedStatus updated");
-            res.status(200).json( {data: doc.authenticatedResJson });
+            res.status(200).json( {data: doc.authenticatedResJson() });
           }
         });
         if (!volunteerInterestFound) {
           console.log("Volunteer not found on list.");
-          res.status(404).json({data: doc.resJson});
+          res.status(404).json({data: doc.resJson() });
         }
 
     } else {
       console.log("User is not creator of task and authorized to update interestedIn status.");
-      res.status(403).json({ data: doc.resJson });
+      res.status(403).json({ data: doc.resJson() });
     }
 
   });
