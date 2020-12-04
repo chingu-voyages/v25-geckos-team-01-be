@@ -25,11 +25,11 @@ const checkExistingUsers = async (req, res, next) => {
         if (existingUser) {
             res.json({
                 data:
-                    "User with the email " + req.body.email + "already exists",
+                    "User With The Email " + req.body.email + " Already Exists",
             });
         } else if (existingName) {
             res.json({
-                data: "User with the name " + req.body.name + "already exists",
+                data: "User With The Name " + req.body.name + " Already Exists",
             });
         } else {
             next();

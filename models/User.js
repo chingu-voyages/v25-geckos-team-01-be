@@ -10,33 +10,24 @@ const userSchema = new mongoose.Schema(
     {
         name: {
             type: String,
-            required: [true, "can't be blank"],
-            maxlength: 125,
-            unique: true,
+            required: true,
             index: true,
         },
         slug: { type: String, slug: "name" },
         email: {
             type: String,
             lowercase: true,
-            unique: true,
-            required: [true, "can't be blank"],
-            match: [/\S+@\S+\.\S+/, "is invalid"],
+            required: true,
             index: true,
         },
-        phoneNumber: {
-            type: String,
-        },
+        phoneNumber: { type: String },
         image: { type: String },
         role: {
             type: String,
             enum: ["organization", "volunteer"],
             require: true,
         },
-        description: {
-            type: String,
-            maxlength: 450,
-        },
+        description: { type: String },
         tags: [String],
         password: {
             type: String,
