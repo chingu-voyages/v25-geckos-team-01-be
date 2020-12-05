@@ -1,4 +1,4 @@
-const { check } = require("express-validator");
+const { check, body } = require("express-validator");
 const User = require("../models/User");
 
 const registrationValidation = [
@@ -47,7 +47,7 @@ const registrationValidation = [
     check("description").escape().trim(),
 
     // tags
-    check("tags").isString(),
+    check("tags"),
 
     // password
     check("password")
@@ -60,12 +60,24 @@ const registrationValidation = [
         .matches("[A-Z]")
         .withMessage("Password Must Contain An Uppercase Letter"),
 
-    // password confirm
-    check("passwordConfirm").custom((value, { req }) => {
-        if (value !== req.body.password) {
-            throw new Error("Password Confirmation Does Not Match Password");
-        }
-    }),
+    // // password confirm
+    // check("passwordConfirm").custom((value, { req }) => {
+    //     if (value !== req.body.password) {
+    //         throw new Error("Password Confirmation Does Not Match Password");
+    //     }
+    // }),
 ];
 
-module.exports = { registrationValidation };
+const taskValidation = [
+    check("title").notEmpty().withMessage("Field Cannot Be Empty"),
+    check("description").escape().trim(),
+    check("skillsRequired").isString(),
+    check("location").isString(),
+    check("taskEnd").isDate().withMessage("Date Must Be In Format YYYY/MM/DD"),
+    check("status")
+        .isIn(["open", "closed"])
+        .withMessage("Must Be Either open Or closed"),
+    check("interestedIn"),
+];
+
+module.exports = { registrationValidation, taskValidation };
