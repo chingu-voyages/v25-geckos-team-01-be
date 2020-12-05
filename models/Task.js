@@ -2,17 +2,27 @@ const mongoose = require("mongoose");
 
 const taskSchema = new mongoose.Schema({
     title: { type: String, require: true },
-    postedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    postedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        require: true,
+    },
     description: { type: String, require: true },
-    skillsRequired: [String],
+    skillsRequired: [{ skill: { type: String } }],
     location: { type: String },
     taskEnd: { type: Date },
     status: { type: String, default: "open", enum: ["open", "closed"] },
-    interestedIn: [{
-      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      accepted: {type: String, default: null, enum: [null, "yes", "no"]},
-      _id: false
-   }],
+    interestedIn: [
+        {
+            user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+            accepted: {
+                type: String,
+                default: null,
+                enum: [null, "yes", "no"],
+            },
+            _id: false,
+        },
+    ],
 });
 
 taskSchema.methods.authenticatedResJson = function () {

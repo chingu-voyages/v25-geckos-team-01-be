@@ -17,14 +17,16 @@ router.post("/login", async (req, res) => {
             if (userIsAuthenticated) {
                 res.status(200).json({ data: user.authenticatedResJson() });
             } else {
-                res.status(400).json("Email or password do not match");
+                res.status(400).json({
+                    Errors: "Email or password do not match",
+                });
             }
         } else {
-            res.status(404).json("User not found");
+            res.status(404).json({ Errors: "User not found" });
         }
     } catch (error) {
         console.log(error);
-        res.status(500).json("Database error: ", error);
+        res.status(500).json({ Errors: error });
     }
 });
 
