@@ -18,25 +18,4 @@ const isLoggedIn = (req, res, next) => {
     });
 };
 
-const checkExistingUsers = async (req, res, next) => {
-    try {
-        const existingUser = await User.findOne({ email: req.body.email });
-        const existingName = await User.findOne({ name: req.body.name });
-        if (existingUser) {
-            res.json({
-                data:
-                    "User with the email " + req.body.email + "already exists",
-            });
-        } else if (existingName) {
-            res.json({
-                data: "User with the name " + req.body.name + "already exists",
-            });
-        } else {
-            next();
-        }
-    } catch (error) {
-        res.status(500).json({ Error: error });
-    }
-};
-
-module.exports = { isLoggedIn, checkExistingUsers };
+module.exports = { isLoggedIn };

@@ -1,7 +1,7 @@
 const express = require("express");
 const User = require("../models/User");
-const jwt = require("jsonwebtoken");
-const { checkExistingUsers } = require("../services/authServices");
+const { validationResult } = require("express-validator");
+const { registrationValidation } = require("../services/validators");
 
 const router = express.Router();
 
@@ -17,32 +17,39 @@ router.post("/login", async (req, res) => {
             if (userIsAuthenticated) {
                 res.status(200).json({ data: user.authenticatedResJson() });
             } else {
-                res.status(400).json("Email or password do not match");
+                res.status(400).json({
+                    Errors: "Email or password do not match",
+                });
             }
         } else {
-            res.status(404).json("User not found");
+            res.status(404).json({ Errors: "User not found" });
         }
     } catch (error) {
         console.log(error);
-        res.status(500).json("Database error: ", error);
+        res.status(500).json({ Errors: error });
     }
 });
 
 // POST Registration
-router.post("/register", checkExistingUsers, async (req, res) => {
-    try {
-        const user = new User();
-        user.name = req.body.name;
-        user.email = req.body.email;
-        user.phoneNumber = req.body.phoneNumber;
-        user.role = req.body.role;
-        user.description = req.body.description;
-        user.tags = req.body.tags;
-        user.password = User.generateHashPassword(req.body.password);
-        await user.save();
-        res.status(200).json({ data: user.authenticatedResJson() });
-    } catch (error) {
-        res.status(500).json({ Error: error });
+router.post("/register", registrationValidation, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ Errors: errors.array() });
+    } else {
+        try {
+            const user = new User();
+            user.name = req.body.name;
+            user.email = req.body.email;
+            user.phoneNumber = req.body.phoneNumber;
+            user.role = req.body.role;
+            user.description = req.body.description;
+            user.tags = req.body.tags;
+            user.password = User.generateHashPassword(req.body.password);
+            await user.save();
+            res.status(200).json({ data: user.authenticatedResJson() });
+        } catch (error) {
+            res.status(500).json({ Error: error });
+        }
     }
 });
 
