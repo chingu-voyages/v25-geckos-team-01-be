@@ -60,12 +60,6 @@ const registrationValidation = [
         .matches("[A-Z]")
         .withMessage("Password Must Contain An Uppercase Letter"),
 
-    // // password confirm
-    // check("passwordConfirm").custom((value, { req }) => {
-    //     if (value !== req.body.password) {
-    //         throw new Error("Password Confirmation Does Not Match Password");
-    //     }
-    // }),
 ];
 
 const taskValidation = [

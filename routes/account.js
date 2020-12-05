@@ -30,12 +30,20 @@ router.put("/", isLoggedIn, async (req, res) => {
     // Should not be able to change the password here.
     // changing the password would require generating a new token and generating a new hash password
     if (req.body.password || req.body.role) {
-        res.json({ Error: "You can't change you password here" });
+        res.json({ Errors: [{ msg: "Unable To Change Password Or Role" }] });
     } else {
         try {
             let updatedUser = await User.findByIdAndUpdate(
                 req.user.id,
-                req.body,
+                [
+                    req.body,
+                    {
+                        image: {
+                            data: req.files.file.data,
+                            contentType: req.files.file.mimetype, // Add image buffer
+                        },
+                    },
+                ],
                 {
                     new: true,
                 }
@@ -43,7 +51,7 @@ router.put("/", isLoggedIn, async (req, res) => {
 
             res.json({ data: updatedUser.authenticatedResJson() });
         } catch (error) {
-            res.status(400).json({ Error: error });
+            res.status(500).json({ Error: error });
         }
     }
 });
@@ -53,13 +61,15 @@ router.delete("/", isLoggedIn, async (req, res, next) => {
     try {
         await User.findByIdAndDelete(req.user.id, (error) => {
             if (error) {
-                return res.json({ Error: "User could not be deleted" });
+                return res
+                    .status(404)
+                    .json({ Errors: [{ msg: "User Could Not Be Deleted" }] });
             }
             res.status(200).json({ data: "User has been deleted" });
             // Here the client side would delete the token and be redirected to
         });
     } catch (error) {
-        res.status(400).json({ Error: error });
+        res.status(500).json({ Error: error });
     }
 });
 
@@ -68,14 +78,13 @@ router.get("/:userSlug", async (req, res) => {
     try {
         let profile = await User.findOne({ slug: req.params.userSlug });
         // console.log(profile)
-        if (profile){
+        if (profile) {
             res.status(200).json({ data: profile.resJson() });
         } else {
-            res.status(404).json({response: "Sorry no user by that name"})
+            res.status(404).json({ Errors: [{ msg: "No User By That Name" }] });
         }
     } catch (error) {
-        console.log(error);
-        res.status(400).json({ Error: error });
+        res.status(500).json({ Error: error });
     }
 });
 

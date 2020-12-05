@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
+const fileUpload = require("express-fileupload");
 const connectDB = require("./models/db");
 
 const app = express();
@@ -9,6 +10,7 @@ connectDB();
 
 app.use(bodyParser.urlencoded({ extended: true })); // parse application/x-www-form-urlencoded
 app.use(bodyParser.json()); // parse application/json
+app.use(fileUpload({ limits: { fileSize: 16000000 } })); // fileSize limit 16mb
 
 // CORS DEV
 app.use((req, res, next) => {

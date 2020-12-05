@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema(
             index: true,
         },
         phoneNumber: { type: String },
-        image: { type: String },
+        image: { data: { type: Buffer }, contentType: { type: String } },
         role: {
             type: String,
             enum: ["organization", "volunteer"],

@@ -18,11 +18,11 @@ router.post("/login", async (req, res) => {
                 res.status(200).json({ data: user.authenticatedResJson() });
             } else {
                 res.status(400).json({
-                    Errors: "Email or password do not match",
+                    Errors: [{ msg: "Email Or Password Do Not Match" }],
                 });
             }
         } else {
-            res.status(404).json({ Errors: "User not found" });
+            res.status(404).json({ Errors: [{ msg: "User Not Found" }] });
         }
     } catch (error) {
         console.log(error);
