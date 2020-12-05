@@ -63,7 +63,7 @@ router.delete("/", isLoggedIn, async (req, res, next) => {
     }
 });
 
-// Get a users  profile regardless of login status
+// Get a users profile regardless of login status
 router.get("/:userSlug", async (req, res) => {
     try {
         let profile = await User.findOne({ slug: req.params.userSlug });

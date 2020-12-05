@@ -99,55 +99,87 @@ router.get("/:userName/:taskId", (req, res) => {
 router.put("/add-interest/:taskId", isLoggedIn, (req, res) => {
   // if logged in user clicks interest in a task, they are added to interestedIn array. Duplication of interest is prohibited
     // $addToSet can be used instead of forEach loop, instead, will only add 1 total instance
-  Task.findOne({ _id: req.params.taskId }, (err, doc) => {
-    let addInterestedUser = {
-      user: req.user.id,
-      accepted: null
-    }
-    let userAdded = false;
-    if (err) {
-      console.log(err);
-    } else {
-      doc.interestedIn.forEach(e => {
-        if (e.user == req.user.id) {
-          console.log("Duplicate request. User interest already added.");
-          res.status(403).json({ data: doc.resJson });
-          return userAdded = true;
-        }
-      });
-
-      if (!userAdded) {
-        Task.findOneAndUpdate({ _id: req.params.taskId }, {$push: {interestedIn: addInterestedUser} }, (error, task) => {
-          if (error) {
-            console.log(error);
-          } else {
-            console.log("user added interest to task");
-            res.status(200).json({data: task.resJson});
-        }
-        });
+  if (req.user.role === "organization") {
+    console.log("Not authorized. Only volunteers can add interest");
+    res.sendStatus(403);
+  } else {
+    Task.findOne({ _id: req.params.taskId }, (err, doc) => {
+      let addInterestedUser = {
+        user: req.user.id,
+        accepted: null
       }
-    }
-  });
+      let userAdded = false;
+      if (err) {
+        console.log(err);
+      } else {
+        doc.interestedIn.forEach(e => {
+          if (e.user == req.user.id) {
+            console.log("Duplicate request. User interest already added.");
+            res.status(403).json({ data: doc.resJson() });
+            return userAdded = true;
+          }
+        });
+
+        if (!userAdded) {
+          Task.findOneAndUpdate({ _id: req.params.taskId }, {$push: {interestedIn: addInterestedUser} }, (error, task) => {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log("user added interest to task");
+              res.status(200).json({data: task.resJson()});
+          }
+          });
+        }
+      }
+    });
+  }
 });
 
 // PUT - remove interestedIn user from task
 router.put("/remove-interest/:taskId", isLoggedIn, (req, res) => {
-  // include if conditional to check if the task id already has the user name in the interestedIn field, if it does, then it can be removed, if not, it this is not authorized.
   Task.findOneAndUpdate({ _id: req.params.taskId }, {$pullAll: {interestedIn: [{user: req.user.id }] } }, (err, doc) => {
     if (err) {
       console.log(err);
     } else {
       console.log("User removed, if they were on list.");
-      res.status(200).json({data: doc.resJson});
+      res.status(200).json({data: doc.resJson() });
         }
       });
 
 });
 
 // PUT - org. to accept or decline interestedIn user
-router.put("/", isLoggedIn, (req,res) => {
-  // write-up
-  let accepted = req.body.accepted; // should be true or false
+router.put("/accept-interest/:taskId", isLoggedIn, async (req,res) => {
+  // on task screen, org. can click on a volunteer that is interestedIn task. If the org. is the creator of the task, then they can either click accept yes, or no.
+  let { acceptedStatus, volunteer } = req.body;
+  Task.findOne({_id: req.params.taskId }, (err, doc) => {
+    let volunteerInterestFound = false;
+
+    if (err) {
+      console.log(err);
+    } else if (req.user.id == doc.postedBy) {
+        doc.interestedIn.forEach(e => {
+          if (e.user == volunteer) {
+            //user matched - make change
+            volunteerInterestFound = true;
+            e.accepted = acceptedStatus;
+            doc.save();
+            console.log("Volunteer acceptedStatus updated");
+            res.status(200).json( {data: doc.authenticatedResJson() });
+          }
+        });
+        if (!volunteerInterestFound) {
+          console.log("Volunteer not found on list.");
+          res.status(404).json({data: doc.resJson() });
+        }
+
+    } else {
+      console.log("User is not creator of task and authorized to update interestedIn status.");
+      res.status(403).json({ data: doc.resJson() });
+    }
+
+  });
+
 });
 
 // DELETE task
