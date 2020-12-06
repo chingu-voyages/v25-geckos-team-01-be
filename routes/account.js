@@ -30,7 +30,7 @@ router.put("/", isLoggedIn, async (req, res) => {
     // Should not be able to change the password here.
     // changing the password would require generating a new token and generating a new hash password
     if (req.body.password || req.body.role) {
-        res.json({ Errors: [{ msg: "Unable To Change Password Or Role" }] });
+        res.status(401).json({ Errors: [{ msg: "Unable To Change Password Or Role" }] });
     } else {
         try {
             let updatedUser = await User.findByIdAndUpdate(

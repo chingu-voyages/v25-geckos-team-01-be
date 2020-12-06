@@ -8,11 +8,11 @@ const isLoggedIn = (req, res, next) => {
     if (jsonToken == null)
         return res
             .status(403)
-            .json({ Error: [{ msg: "Authorization Error" }] });
+            .json({ Errors: [{ msg: "Authorization Error" }] });
 
     jwt.verify(jsonToken, process.env.JWT_SECRET, (err, user) => {
         if (err) {
-            res.status(403).json({ Error: [{ msg: "Authorization Error" }] });
+            res.status(403).json({ Errors: [{ msg: "Authorization Error" }] });
         }
         // console.log(user);
         req.user = user;

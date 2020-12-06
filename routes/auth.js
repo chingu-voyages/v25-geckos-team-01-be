@@ -25,7 +25,6 @@ router.post("/login", async (req, res) => {
             res.status(404).json({ Errors: [{ msg: "User Not Found" }] });
         }
     } catch (error) {
-        console.log(error);
         res.status(500).json({ Errors: error });
     }
 });
