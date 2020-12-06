@@ -6,9 +6,9 @@ const router = express.Router();
 router.get("/", async (req, res) => {
     try {
         let tasks = await Task.find({});
-        res.json(tasks);
+        res.status(200).json(tasks);
     } catch (err) {
-        res.sendStatus(500);
+        res.status(500).json({ Error: err });
     }
 });
 
