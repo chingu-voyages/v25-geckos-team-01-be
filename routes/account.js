@@ -2,6 +2,7 @@ const express = require("express");
 const User = require("../models/User");
 const Task = require("../models/Task");
 const { isLoggedIn } = require("../services/authServices");
+const { updateUserValidation } = require("../services/validators");
 
 const router = express.Router();
 
@@ -10,17 +11,27 @@ router.get("/", isLoggedIn, async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
         // logic separating volunteer and organization account pages
-        if (user && user.role === "organization") {
-            const userTasks = await Task.find({ postedBy: user._id });
-            res.status(200).json({
-                data: user.authenticatedResJson(),
-                tasks: userTasks.authenticatedResJson(),
-            });
-        } else if (user && user.role === "volunteer") {
+        if (user.role == "organization") {
+            const userTasks = await Task.find({ postedBy: user.id });
+            if (!Object.keys(userTasks).length) {
+                // checking if tasks is empty aka no tasks by user
+                res.status(200).json({
+                    data: user.authenticatedResJson(),
+                });
+            } else {
+                res.status(200).json({
+                    data: user.authenticatedResJson(),
+                    tasks: userTasks.authenticatedResJson(),
+                });
+            }
+        } else if (user.role == "volunteer") {
             // user is a volunteer
+            console.log("volunteer");
             res.status(200).json({ data: user.authenticatedResJson() });
         }
     } catch (err) {
+        console.log(err);
+
         res.status(404).json({
             Errors: [{ msg: "User Not Found" }, { msg: err }],
         });
@@ -28,26 +39,39 @@ router.get("/", isLoggedIn, async (req, res) => {
 });
 
 // Update the currently logged in Users account info
-router.put("/", isLoggedIn, async (req, res) => {
-    // Should not be able to change the password here.
-    // changing the password would require generating a new token and generating a new hash password
-    if (req.body.password || req.body.role) {
+router.put("/", isLoggedIn, updateUserValidation, async (req, res) => {
+    // Should be able to change password now
+    // At the moment Tags cannot be updated, and after save they must change the token to the returned token
+    if (req.body.role) {
         res.status(401).json({
             Errors: [{ msg: "Unable To Change Password Or Role" }],
         });
+    } else if (req.files && req.body) {
+        try {
+            const file = {
+                image: {
+                    data: req.files.file.data,
+                    contentType: req.files.file.mimetype,
+                },
+            };
+            const update = { ...req.body, ...file };
+            let updatedUser = await User.findByIdAndUpdate(
+                req.user.id,
+                update,
+                {
+                    new: true,
+                }
+            );
+
+            res.json({ data: updatedUser.authenticatedResJson() });
+        } catch (error) {
+            res.status(500).json({ Error: error });
+        }
     } else {
         try {
             let updatedUser = await User.findByIdAndUpdate(
                 req.user.id,
-                [
-                    req.body,
-                    {
-                        image: {
-                            data: req.files.file.data,
-                            contentType: req.files.file.mimetype, // Add image buffer
-                        },
-                    },
-                ],
+                req.body,
                 {
                     new: true,
                 }
