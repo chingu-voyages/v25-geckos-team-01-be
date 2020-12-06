@@ -36,7 +36,7 @@ const registrationValidation = [
         .withMessage("Must Be A Valid Phone Number"),
 
     // images
-    check("image").isArray(),
+    // check("image").isArray(),
 
     // role
     check("role")
