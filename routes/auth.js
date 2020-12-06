@@ -36,14 +36,7 @@ router.post("/register", registrationValidation, async (req, res) => {
         return res.status(400).json({ Errors: errors.array() });
     } else {
         try {
-            const user = new User();
-            user.name = req.body.name;
-            user.email = req.body.email;
-            user.phoneNumber = req.body.phoneNumber;
-            user.role = req.body.role;
-            user.description = req.body.description;
-            user.tags = req.body.tags;
-            user.password = User.generateHashPassword(req.body.password);
+            const user = new User(req.body);
             await user.save();
             res.status(200).json({ data: user.authenticatedResJson() });
         } catch (error) {
