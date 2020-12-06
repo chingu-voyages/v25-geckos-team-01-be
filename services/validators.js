@@ -36,7 +36,7 @@ const registrationValidation = [
         .withMessage("Must Be A Valid Phone Number"),
 
     // images
-    check("image").isString(),
+    check("image").isArray(),
 
     // role
     check("role")
@@ -59,7 +59,6 @@ const registrationValidation = [
         .withMessage("Password Must Contain A Number")
         .matches("[A-Z]")
         .withMessage("Password Must Contain An Uppercase Letter"),
-
 ];
 
 const taskValidation = [

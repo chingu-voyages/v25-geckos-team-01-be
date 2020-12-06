@@ -10,18 +10,20 @@ router.get("/", isLoggedIn, async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
         // logic separating volunteer and organization account pages
-        if (user.role === "organization") {
+        if (user && user.role === "organization") {
             const userTasks = await Task.find({ postedBy: user._id });
             res.status(200).json({
                 data: user.authenticatedResJson(),
                 tasks: userTasks.authenticatedResJson(),
             });
-        } else {
+        } else if (user && user.role === "volunteer") {
             // user is a volunteer
             res.status(200).json({ data: user.authenticatedResJson() });
         }
     } catch (err) {
-        res.status(400);
+        res.status(404).json({
+            Errors: [{ msg: "User Not Found" }, { msg: err }],
+        });
     }
 });
 
@@ -30,7 +32,9 @@ router.put("/", isLoggedIn, async (req, res) => {
     // Should not be able to change the password here.
     // changing the password would require generating a new token and generating a new hash password
     if (req.body.password || req.body.role) {
-        res.status(401).json({ Errors: [{ msg: "Unable To Change Password Or Role" }] });
+        res.status(401).json({
+            Errors: [{ msg: "Unable To Change Password Or Role" }],
+        });
     } else {
         try {
             let updatedUser = await User.findByIdAndUpdate(
@@ -74,9 +78,9 @@ router.delete("/", isLoggedIn, async (req, res, next) => {
 });
 
 // Get a users profile regardless of login status
-router.get("/:userSlug", async (req, res) => {
+router.get("/:userId", async (req, res) => {
     try {
-        let profile = await User.findOne({ slug: req.params.userSlug });
+        let profile = await User.findOne({ _id: req.params.userId });
         // console.log(profile)
         if (profile) {
             res.status(200).json({ data: profile.resJson() });
