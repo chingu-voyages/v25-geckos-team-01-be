@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-mongoose.set("useCreateIndex", true);
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const slug = require("mongoose-slug-generator");
@@ -37,14 +36,6 @@ const userSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-userSchema.statics.generateHashPassword = (password) => {
-    if (password) {
-        const salt = bcrypt.genSaltSync(10);
-        const hash = bcrypt.hashSync(password, salt);
-        return hash;
-    }
-};
-
 userSchema.methods.validatePassword = (password, hashedPassword) => {
     let res = bcrypt.compareSync(password, hashedPassword);
     return res;
@@ -64,6 +55,16 @@ userSchema.methods.generateJWT = function () {
         { expiresIn: "10h" }
     );
 };
+
+userSchema.pre("save", function (next) {
+    var user = this;
+    const salt = bcrypt.genSaltSync(10);
+    bcrypt.hash(user.password, salt, function (err, hash) {
+        if (err) return next(err);
+        user.password = hash;
+        next();
+    });
+});
 
 userSchema.methods.authenticatedResJson = function () {
     return {
