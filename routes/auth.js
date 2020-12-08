@@ -36,10 +36,16 @@ router.post("/register", registrationValidation, async (req, res) => {
         return res.status(400).json({ Errors: errors.array() });
     } else {
         try {
-            const user = new User(req.body);
-            // user.name = req.body.name;
-            // user.email = req.body.email;
-            // user.
+            const user = new User();
+            user.name = req.body.name;
+            user.email = req.body.email;
+            user.phoneNumber = req.body.phoneNumber;
+            user.image = req.body.image;
+            user.role = req.body.role;
+            user.description = req.body.description;
+            user.tags = req.body.tags.split(",");
+            user.password = req.body.password;
+            
             await user.save();
             res.status(200).json({ data: user.authenticatedResJson() });
         } catch (error) {
