@@ -37,6 +37,9 @@ router.post("/register", registrationValidation, async (req, res) => {
     } else {
         try {
             const user = new User(req.body);
+            // user.name = req.body.name;
+            // user.email = req.body.email;
+            // user.
             await user.save();
             res.status(200).json({ data: user.authenticatedResJson() });
         } catch (error) {

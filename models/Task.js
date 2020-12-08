@@ -8,7 +8,7 @@ const taskSchema = new mongoose.Schema({
         require: true,
     },
     description: { type: String, require: true },
-    skillsRequired: [{ skill: { type: String } }],
+    skillsRequired: [{ type: String } ],
     location: { type: String },
     taskEnd: { type: Date },
     status: { type: String, default: "open", enum: ["open", "closed"] },
