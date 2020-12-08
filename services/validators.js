@@ -31,7 +31,15 @@ const registrationValidation = [
         .normalizeEmail(),
 
     // phoneNumber
-    check("phoneNumber").isMobilePhone().withMessage("Must Be  A Valid Phone Number"),
+    check("phoneNumber").custom((phoneNumber) => {
+        if (phoneNumber) {
+            phoneNumber
+                .isMobilePhone()
+                .withMessage("Must Be  A Valid Phone Number");
+        } else {
+            return true;
+        }
+    }),
 
     // role
     check("role")
@@ -39,7 +47,13 @@ const registrationValidation = [
         .withMessage("Must Be Either An organization Or A volunteer"),
 
     // description
-    check("description").escape().trim(),
+    check("description").custom((description) => {
+        if (description) {
+            description.escape().trim();
+        } else {
+            return true;
+        }
+    }),
 
     // tags
     check("tags").isString(),
@@ -145,4 +159,8 @@ const taskValidation = [
     check("interestedIn"),
 ];
 
-module.exports = { registrationValidation, updateUserValidation, taskValidation };
+module.exports = {
+    registrationValidation,
+    updateUserValidation,
+    taskValidation,
+};
