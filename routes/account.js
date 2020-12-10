@@ -54,6 +54,7 @@ router.put("/", isLoggedIn, updateUserValidation, async (req, res) => {
                     contentType: req.files.file.mimetype,
                 },
             };
+            req.body.tags = req.body.tags.split(",");
             const update = { ...req.body, ...file };
             let updatedUser = await User.findByIdAndUpdate(
                 req.user.id,
@@ -69,6 +70,7 @@ router.put("/", isLoggedIn, updateUserValidation, async (req, res) => {
         }
     } else {
         try {
+            req.body.tags = req.body.tags.split(",");
             let updatedUser = await User.findByIdAndUpdate(
                 req.user.id,
                 req.body,

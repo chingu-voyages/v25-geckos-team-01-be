@@ -111,13 +111,7 @@ const updateUserValidation = [
     }),
 
     // tags
-    check("tags").custom((tags) => {
-        if (tags) {
-            tags.isString();
-        } else {
-            return true;
-        }
-    }),
+    check("tags").isString(),
 
     // password
     check("password").custom((password) => {
