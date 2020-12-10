@@ -31,15 +31,7 @@ const registrationValidation = [
         .normalizeEmail(),
 
     // phoneNumber
-    check("phoneNumber").custom((phoneNumber) => {
-        if (phoneNumber) {
-            phoneNumber
-                .isMobilePhone()
-                .withMessage("Must Be  A Valid Phone Number");
-        } else {
-            return true;
-        }
-    }),
+    check("phoneNumber").isMobilePhone().withMessage("Must Be  A Valid Phone Number"),
 
     // role
     check("role")
@@ -47,13 +39,7 @@ const registrationValidation = [
         .withMessage("Must Be Either An organization Or A volunteer"),
 
     // description
-    check("description").custom((description) => {
-        if (description) {
-            description.escape().trim();
-        } else {
-            return true;
-        }
-    }),
+    check("description").escape().trim(),
 
     // tags
     check("tags").isString(),
