@@ -104,10 +104,8 @@ const updateUserValidation = [
     // description
     check("description").custom((description) => {
         if (description) {
-            description.escape().trim();
-        } else {
-            return true;
-        }
+            description.trim();
+        } else return true;
     }),
 
     // tags
@@ -129,7 +127,7 @@ const updateUserValidation = [
 
 const taskValidation = [
     check("title").notEmpty().withMessage("Field Cannot Be Empty"),
-    check("description").escape().trim(),
+    check("description").trim(),
     check("skillsRequired").isString(),
     check("location").isString(),
     check("taskEnd").isDate().withMessage("Date Must Be In Format YYYY/MM/DD"),
