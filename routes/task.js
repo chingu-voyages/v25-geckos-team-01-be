@@ -64,7 +64,8 @@ router.put("/edit/:taskId", isLoggedIn, (req, res) => {
     Task.findOne({ _id: req.params.taskId }, (err, doc) => {
         if (err) {
             res.status(500).json({ Error: error });
-        } else if (req.user.id !== doc.postedBy) {
+        } else if (req.user.id != doc.postedBy) {
+          console.log("testing result:", req.user.id, doc.postedBy);
             res.status(401).json({
                 Errors: [
                     { msg: `${req.user.name} Is Not Authorized To Edit Task` },
@@ -73,6 +74,7 @@ router.put("/edit/:taskId", isLoggedIn, (req, res) => {
             mongoose.connection.close();
         } else {
             // name matches logon
+            req.body.skillsRequired = req.body.skillsRequired.split(",");
             Task.findByIdAndUpdate(
                 req.params.taskId,
                 req.body,
@@ -160,7 +162,7 @@ router.put("/add-interest/:taskId", isLoggedIn, (req, res) => {
 });
 
 // PUT - remove interestedIn user from task
-// TODO: the only users that should be able to remove interest is the author and the person that showed interest
+// TODO: the only users that should be able to remove interest is the person that showed interest
 router.put("/remove-interest/:taskId", isLoggedIn, (req, res) => {
     Task.findOneAndUpdate(
         { _id: req.params.taskId },
